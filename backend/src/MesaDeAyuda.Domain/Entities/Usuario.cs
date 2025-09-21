@@ -24,6 +24,12 @@ public class Usuario
     [Required]
     public required Rol Rol { get; set; }
 
+    [MaxLength(100)]
+    public string? Contrasenia { get; set; }
+
+    [Required]
+    public required DateTime FechaCreacion { get; set; }
+
     [InverseProperty(nameof(Ticket.UsuarioRutCreadorNavigation))]
     public List<Ticket> ListTicketCreado { get; set; } = [];
 
