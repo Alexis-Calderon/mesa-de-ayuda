@@ -1,4 +1,6 @@
+using MesaDeAyuda.Data.Interfaces.UseCases;
 using MesaDeAyuda.Data.Persistency.Contexts;
+using MesaDeAyuda.Data.UseCases;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,9 @@ public static class DependencyInjections
         services.AddDbContext<MesaDeAyudaContext>(options =>
             options.UseSqlite(connectionStringBuilder.ToString())
         );
+
+        services.AddScoped<ITicketUseCases, TicketUseCases>();
+        services.AddScoped<IUsuarioUseCases, UsuarioUseCases>();
         return services;
     }
 }
