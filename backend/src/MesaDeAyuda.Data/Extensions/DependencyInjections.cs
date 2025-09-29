@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace MesaDeAyuda.Data.Extensions;
 
@@ -23,6 +24,8 @@ public static class DependencyInjections
 
         services.AddScoped<ITicketUseCases, TicketUseCases>();
         services.AddScoped<IUsuarioUseCases, UsuarioUseCases>();
+        services.AddScoped<IComentarioUseCases, ComentarioUseCases>();
+
         return services;
     }
 }

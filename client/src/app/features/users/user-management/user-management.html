@@ -1,0 +1,169 @@
+<div class="user-management-container">
+  <div class="header">
+    <h1>Gestión de Usuarios</h1>
+    <button class="btn-primary" (click)="toggleCreateForm()" *ngIf="!showCreateForm">
+      <span>+</span> Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Create User Form -->
+  <div class="form-card" *ngIf="showCreateForm">
+    <h3>Crear Nuevo Usuario</h3>
+    <form [formGroup]="createForm" (ngSubmit)="onCreateUser()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rut">RUT</label>
+          <input
+            type="text"
+            id="rut"
+            formControlName="rut"
+            placeholder="12345678-9"
+            [class.error]="createForm.get('rut')?.invalid && createForm.get('rut')?.touched">
+          <div class="error-message" *ngIf="createForm.get('rut')?.invalid && createForm.get('rut')?.touched">
+            RUT inválido (formato: 12345678-9)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input
+            type="text"
+            id="nombre"
+            formControlName="nombre"
+            placeholder="Nombre completo"
+            [class.error]="createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched">
+          <div class="error-message" *ngIf="createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched">
+            Nombre requerido (mínimo 2 caracteres)
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="usuario@empresa.com"
+            [class.error]="createForm.get('email')?.invalid && createForm.get('email')?.touched">
+          <div class="error-message" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">
+            Email inválido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rol">Rol</label>
+          <select id="rol" formControlName="rol">
+            <option [value]="3">Cliente</option>
+            <option [value]="2">Técnico</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="contrasenia">Contraseña</label>
+        <input
+          type="password"
+          id="contrasenia"
+          formControlName="contrasenia"
+          placeholder="Contraseña"
+          [class.error]="createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched">
+        <div class="error-message" *ngIf="createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched">
+          Contraseña requerida (mínimo 6 caracteres)
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="toggleCreateForm()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <span *ngIf="isLoading">Creando...</span>
+          <span *ngIf="!isLoading">Crear Usuario</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Edit User Form -->
+  <div class="form-card" *ngIf="editingUser">
+    <h3>Editar Usuario: {{ editingUser.nombre }}</h3>
+    <form [formGroup]="editForm" (ngSubmit)="onUpdateUser()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-nombre">Nombre</label>
+          <input
+            type="text"
+            id="edit-nombre"
+            formControlName="nombre"
+            [class.error]="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
+          <div class="error-message" *ngIf="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
+            Nombre requerido (mínimo 2 caracteres)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-rol">Rol</label>
+          <select id="edit-rol" formControlName="rol">
+            <option [value]="3">Cliente</option>
+            <option [value]="2">Técnico</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-email">Email</label>
+        <input
+          type="email"
+          id="edit-email"
+          formControlName="email"
+          [class.error]="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+        <div class="error-message" *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+          Email inválido
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancelEdit()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <span *ngIf="isLoading">Actualizando...</span>
+          <span *ngIf="!isLoading">Actualizar Usuario</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Users List -->
+  <div class="users-list">
+    <div class="loading" *ngIf="isLoading && users.length === 0">
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <div class="user-card" *ngFor="let user of users">
+      <div class="user-info">
+        <div class="user-header">
+          <h4>{{ user.nombre }}</h4>
+          <span class="user-role" [ngClass]="getRoleColor(user.rol)">
+            {{ getRoleDisplayName(user.rol) }}
+          </span>
+        </div>
+        <div class="user-details">
+          <p><strong>RUT:</strong> {{ user.rut }}</p>
+          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p><strong>Fecha de creación:</strong> {{ user.fechaCreacion | date:'short' }}</p>
+        </div>
+      </div>
+      <div class="user-actions">
+        <button class="btn-edit" (click)="startEditUser(user)" [disabled]="isLoading">
+          ✏️ Editar
+        </button>
+        <button class="btn-delete" (click)="deleteUser(user)" [disabled]="isLoading">
+          🗑️ Eliminar
+        </button>
+      </div>
+    </div>
+
+    <div class="no-users" *ngIf="!isLoading && users.length === 0">
+      <p>No hay usuarios registrados.</p>
+    </div>
+  </div>
+</div>

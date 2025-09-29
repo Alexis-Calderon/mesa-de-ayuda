@@ -1,0 +1,27 @@
+services:
+  mesa-de-ayuda-api:
+    build:
+      context: ./backend
+      dockerfile: src/MesaDeAyuda.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Data Source=/app/App_Data/mesa_de_ayuda.db
+      - Jwt__Key=YourSuperSecretKeyHere12345678901234567890
+      - Jwt__Issuer=MesaDeAyuda.Api
+      - Jwt__Audience=MesaDeAyuda.Client
+      - Jwt__ExpiryInMinutes=60
+    volumes:
+      - mesa-ayuda-data:/app/App_Data
+    networks:
+      - mesa-ayuda-network
+
+volumes:
+  mesa-ayuda-data:
+    driver: local
+
+networks:
+  mesa-ayuda-network:
+    driver: bridge

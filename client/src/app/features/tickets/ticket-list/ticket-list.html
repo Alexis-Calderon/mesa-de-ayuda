@@ -1,0 +1,141 @@
+<div class="ticket-list-container">
+  <div class="header">
+    <h1>Lista de Tickets</h1>
+    <a routerLink="/tickets/create" class="btn-primary" *ngIf="currentUser?.rol === 3">
+      <span>+</span> Nuevo Ticket
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <h3>Filtros</h3>
+    <form [formGroup]="filterForm" class="filters-form">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="estado">Estado</label>
+          <select id="estado" formControlName="estado">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="prioridad">Prioridad</label>
+          <select id="prioridad" formControlName="prioridad">
+            <option *ngFor="let option of priorityOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="area">Área</label>
+          <select id="area" formControlName="area">
+            <option *ngFor="let option of areaOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="search">Buscar</label>
+          <input
+            type="text"
+            id="search"
+            formControlName="search"
+            placeholder="Buscar en descripción..."
+          >
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-secondary" (click)="clearFilters()">
+          Limpiar Filtros
+        </button>
+        <button type="button" class="btn-primary" (click)="loadTickets()">
+          Actualizar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tickets List -->
+  <div class="tickets-section">
+    <div class="loading" *ngIf="isLoading">
+      <p>Cargando tickets...</p>
+    </div>
+
+    <div class="no-tickets" *ngIf="!isLoading && filteredTickets.length === 0 && tickets.length === 0">
+      <p>No hay tickets disponibles.</p>
+      <a routerLink="/tickets/create" class="btn-primary" *ngIf="currentUser?.rol === 3">
+        Crear tu primer ticket
+      </a>
+    </div>
+
+    <div class="no-results" *ngIf="!isLoading && filteredTickets.length === 0 && tickets.length > 0">
+      <p>No se encontraron tickets con los filtros aplicados.</p>
+    </div>
+
+    <div class="ticket-card" *ngFor="let ticket of filteredTickets">
+      <div class="ticket-header">
+        <div class="ticket-id">
+          <span class="id-label">#{{ ticket.id }}</span>
+        </div>
+        <div class="ticket-badges">
+          <span class="badge status" [ngClass]="getStatusColor(ticket.estado)">
+            {{ ticket.estado }}
+          </span>
+          <span class="badge priority" [ngClass]="getPriorityColor(ticket.prioridad)">
+            {{ ticket.prioridad }}
+          </span>
+          <span class="badge area">
+            {{ getAreaDisplayName(ticket.area) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="ticket-content">
+        <h4>{{ ticket.descripcion }}</h4>
+        <p class="observations">{{ ticket.observaciones }}</p>
+
+        <div class="ticket-meta">
+          <div class="meta-item">
+            <strong>Creado por:</strong>
+            <span>{{ ticket.usuarioRutCreadorNavigation.nombre }}</span>
+          </div>
+          <div class="meta-item" *ngIf="ticket.usuarioRutTecnicoNavigation">
+            <strong>Asignado a:</strong>
+            <span>{{ ticket.usuarioRutTecnicoNavigation.nombre }}</span>
+          </div>
+          <div class="meta-item">
+            <strong>Fecha creación:</strong>
+            <span>{{ ticket.fechaCreacion | date:'short' }}</span>
+          </div>
+          <div class="meta-item" *ngIf="ticket.fechaResolucion">
+            <strong>Fecha resolución:</strong>
+            <span>{{ ticket.fechaResolucion | date:'short' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-actions" *ngIf="canEditTicket(ticket) || canResolveTicket(ticket)">
+        <button
+          class="btn-action assign"
+          (click)="assignTecnico(ticket)"
+          *ngIf="currentUser?.rol === 1 && !ticket.usuarioRutTecnicoNavigation"
+          [disabled]="isLoading">
+          👤 Asignar Técnico
+        </button>
+
+        <button
+          class="btn-action resolve"
+          (click)="resolveTicket(ticket)"
+          *ngIf="canResolveTicket(ticket)"
+          [disabled]="isLoading">
+          ✅ Resolver
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

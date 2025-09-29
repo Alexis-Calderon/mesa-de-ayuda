@@ -1,3 +1,5 @@
+using System;
+
 namespace MesaDeAyuda.Data.Dtos.Usuario;
 
 public class UsuarioResponseDto : UsuarioDto

@@ -1,0 +1,97 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Mesa de Ayuda</h1>
+      <div class="user-info">
+        <span *ngIf="currentUser">Bienvenido, {{ currentUser.nombre }} ({{ getRoleDisplayName(currentUser.rol) }})</span>
+        <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="!isLoading">
+      <div class="stat-card">
+        <div class="stat-icon total">📊</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalTickets }}</h3>
+          <p>Total de Tickets</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon open">🔴</div>
+        <div class="stat-content">
+          <h3>{{ stats.ticketsAbiertos }}</h3>
+          <p>Tickets Abiertos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon review">🟡</div>
+        <div class="stat-content">
+          <h3>{{ stats.ticketsRevision }}</h3>
+          <p>En Revisión</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon resolved">🟢</div>
+        <div class="stat-content">
+          <h3>{{ stats.ticketsResueltos }}</h3>
+          <p>Resueltos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="isLoading">
+      <p>Cargando datos del dashboard...</p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <h2>Acciones Rápidas</h2>
+      <div class="action-buttons">
+        <a routerLink="/tickets/create" class="action-btn primary" *ngIf="currentUser?.rol === 3">
+          <span>➕</span> Crear Nuevo Ticket
+        </a>
+        <a routerLink="/tickets" class="action-btn secondary">
+          <span>📋</span> Ver Todos los Tickets
+        </a>
+        <a routerLink="/users" class="action-btn admin" *ngIf="currentUser?.rol === 1">
+          <span>👥</span> Gestionar Usuarios
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Tickets -->
+    <div class="recent-tickets" *ngIf="!isLoading && recentTickets.length > 0">
+      <h2>Tickets Recientes</h2>
+      <div class="tickets-list">
+        <div class="ticket-item" *ngFor="let ticket of recentTickets">
+          <div class="ticket-header">
+            <span class="ticket-id">#{{ ticket.id }}</span>
+            <span class="ticket-status" [ngClass]="getStatusColor(ticket.estado)">
+              {{ ticket.estado }}
+            </span>
+          </div>
+          <div class="ticket-content">
+            <h4>{{ ticket.descripcion }}</h4>
+            <p class="ticket-meta">
+              <span>👤 {{ ticket.usuarioRutCreadorNavigation.nombre }}</span>
+              <span>📅 {{ ticket.fechaCreacion | date:'short' }}</span>
+              <span *ngIf="ticket.usuarioRutTecnicoNavigation">
+                🔧 {{ ticket.usuarioRutTecnicoNavigation.nombre }}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <a routerLink="/tickets" class="view-all-link">Ver todos los tickets →</a>
+    </div>
+  </main>
+</div>

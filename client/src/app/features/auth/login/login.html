@@ -1,0 +1,49 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Iniciar Sesión</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- RUT Field -->
+      <div class="form-group">
+        <label for="rut">RUT</label>
+        <input
+          type="text"
+          id="rut"
+          formControlName="rut"
+          placeholder="12345678-9"
+          [class.error]="loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched">
+        <div class="error-message" *ngIf="loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched">
+          {{ getErrorMessage('rut') }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="contrasenia">Contraseña</label>
+        <input
+          type="password"
+          id="contrasenia"
+          formControlName="contrasenia"
+          placeholder="Ingrese su contraseña"
+          [class.error]="loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched">
+        <div class="error-message" *ngIf="loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched">
+          {{ getErrorMessage('contrasenia') }}
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="isLoading">
+        <span *ngIf="isLoading">Iniciando sesión...</span>
+        <span *ngIf="!isLoading">Iniciar Sesión</span>
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+bin/
+obj/
+out/
+*.user
+*.tmp
+*.log
+*.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Archivos de desarrollo
+appsettings.Development.json
+*.http
+
+# Documentación
+README.md
+
+# Archivos de Git
+.git/
+.gitignore
+
+# Archivos de Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Archivos de pruebas
+*.testsettings
+*.runsettings
+test-results/
+coverage/
+
+# Archivos temporales
+*.tmp
+*.temp

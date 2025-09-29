@@ -1,11 +1,56 @@
+using System.Text;
+using MesaDeAyuda.Api.Services;
 using MesaDeAyuda.Data.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddData(builder.Environment);
+
+// JWT Configuration
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+        }
+    );
+
+builder
+    .Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminOnly", policy => policy.RequireRole("Administrador"))
+    .AddPolicy("TecnicoOrAdmin", policy => policy.RequireRole("Técnico", "Administrador"))
+    .AddPolicy(
+        "ClienteOrTecnicoOrAdmin",
+        policy => policy.RequireRole("Cliente", "Técnico", "Administrador")
+    );
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AllowAngular",
+        policy => policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()
+    );
+});
 
 var app = builder.Build();
 
@@ -13,44 +58,31 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/openapi/v1.json", "Mesa de Ayuda API v1")
+    );
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
+app.UseAuthentication();
+app.UseAuthorization();
 
-var summaries = new[]
+app.MapControllers();
+
+// Aplicar migraciones y ejecutar seeder de datos
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing",
-    "Bracing",
-    "Chilly",
-    "Cool",
-    "Mild",
-    "Warm",
-    "Balmy",
-    "Hot",
-    "Sweltering",
-    "Scorching",
-};
+    var services = scope.ServiceProvider;
+    var context =
+        services.GetRequiredService<MesaDeAyuda.Data.Persistency.Contexts.MesaDeAyudaContext>();
 
-app.MapGet(
-        "/weatherforecast",
-        () =>
-        {
-            var forecast = Enumerable
-                .Range(1, 5)
-                .Select(index => new WeatherForecast(
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-                .ToArray();
-            return forecast;
-        }
-    )
-    .WithName("GetWeatherForecast");
+    // Crear base de datos si no existe (SQLite)
+    await context.Database.EnsureCreatedAsync();
+
+    // Ejecutar seeder de datos
+    var seeder = new DataSeeder(context);
+    await seeder.SeedAsync();
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

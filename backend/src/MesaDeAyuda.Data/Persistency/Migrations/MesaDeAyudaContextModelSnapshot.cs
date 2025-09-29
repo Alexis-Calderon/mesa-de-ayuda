@@ -17,6 +17,37 @@ namespace MesaDeAyuda.Data.Persistency.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
+            modelBuilder.Entity("MesaDeAyuda.Domain.Entities.Comentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UsuarioRut")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketId");
+
+                    b.HasIndex("UsuarioRut");
+
+                    b.ToTable("Comentario", "MesaDeAyuda");
+                });
+
             modelBuilder.Entity("MesaDeAyuda.Domain.Entities.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -96,6 +127,25 @@ namespace MesaDeAyuda.Data.Persistency.Migrations
                     b.HasKey("Rut");
 
                     b.ToTable("Usuario", "MesaDeAyuda");
+                });
+
+            modelBuilder.Entity("MesaDeAyuda.Domain.Entities.Comentario", b =>
+                {
+                    b.HasOne("MesaDeAyuda.Domain.Entities.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MesaDeAyuda.Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioRut")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("MesaDeAyuda.Domain.Entities.Ticket", b =>

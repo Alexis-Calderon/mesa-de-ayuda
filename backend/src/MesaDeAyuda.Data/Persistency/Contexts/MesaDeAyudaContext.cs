@@ -7,4 +7,5 @@ public class MesaDeAyudaContext(DbContextOptions<MesaDeAyudaContext> options) : 
 {
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<Comentario> Comentarios { get; set; }
 }

@@ -1,0 +1,109 @@
+<div class="ticket-create-container">
+  <div class="header">
+    <h1>Crear Nuevo Ticket</h1>
+    <button class="btn-secondary" (click)="onCancel()">← Volver</button>
+  </div>
+
+  <div class="form-card">
+    <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <h3>Información del Ticket</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo">Tipo de Ticket</label>
+            <select id="tipo" formControlName="tipo" [class.error]="createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched">
+              <option *ngFor="let option of tipoOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched">
+              {{ getErrorMessage('tipo') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prioridad">Prioridad</label>
+            <select id="prioridad" formControlName="prioridad" [class.error]="createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched">
+              <option *ngFor="let option of prioridadOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched">
+              {{ getErrorMessage('prioridad') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="area">Área Afectada</label>
+            <select id="area" formControlName="area" [class.error]="createForm.get('area')?.invalid && createForm.get('area')?.touched">
+              <option value="">Seleccionar área</option>
+              <option *ngFor="let option of areaOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="createForm.get('area')?.invalid && createForm.get('area')?.touched">
+              {{ getErrorMessage('area') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Descripción del Problema</h3>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción Breve</label>
+          <input
+            type="text"
+            id="descripcion"
+            formControlName="descripcion"
+            placeholder="Resuma el problema en una frase"
+            [class.error]="createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched">
+          <div class="error-message" *ngIf="createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched">
+            {{ getErrorMessage('descripcion') }}
+          </div>
+          <small class="help-text">
+            Máximo 100 caracteres. Sea específico y claro.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="observaciones">Observaciones Detalladas</label>
+          <textarea
+            id="observaciones"
+            formControlName="observaciones"
+            rows="6"
+            placeholder="Describa detalladamente el problema, incluyendo pasos para reproducirlo, impacto en el trabajo, etc."
+            [class.error]="createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched">
+          </textarea>
+          <div class="error-message" *ngIf="createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched">
+            {{ getErrorMessage('observaciones') }}
+          </div>
+          <small class="help-text">
+            Máximo 500 caracteres. Incluya toda la información relevante para que el técnico pueda resolver el problema.
+          </small>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading || createForm.invalid">
+          <span *ngIf="isLoading">Creando Ticket...</span>
+          <span *ngIf="!isLoading">Crear Ticket</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="info-card">
+    <h4>💡 Consejos para crear un buen ticket</h4>
+    <ul>
+      <li><strong>Sea específico:</strong> Describa exactamente qué problema está experimentando</li>
+      <li><strong>Incluya contexto:</strong> Mencione qué estaba haciendo cuando ocurrió el problema</li>
+      <li><strong>Proporcione pasos:</strong> Si es posible, indique cómo reproducir el problema</li>
+      <li><strong>Especifique impacto:</strong> Indique cómo afecta esto su trabajo</li>
+      <li><strong>Adjunte evidencia:</strong> Si tiene capturas de pantalla o logs, inclúyalos en las observaciones</li>
+    </ul>
+  </div>
+</div>
