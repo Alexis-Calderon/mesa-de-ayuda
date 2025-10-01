@@ -183,6 +183,21 @@
   color: white;
 }
 
+.type-incident {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.type-request {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.type-query {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+}
+
 .badge.area {
   background: linear-gradient(135deg, #6c757d, #5a6268);
   color: white;
@@ -198,6 +213,41 @@
   color: #666;
   margin: 0 0 1rem 0;
   line-height: 1.5;
+}
+
+.ticket-properties {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.property-row {
+  display: flex;
+  gap: 2rem;
+}
+
+.property-row:last-child {
+  margin-bottom: 0;
+}
+
+.property-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.property-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+  min-width: 70px;
+}
+
+.property-value {
+  color: #6c757d;
+  font-size: 0.9rem;
 }
 
 .ticket-meta {

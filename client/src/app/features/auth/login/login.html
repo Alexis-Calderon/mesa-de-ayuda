@@ -1,49 +1,67 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>Iniciar Sesión</h2>
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-primary">
+  <div class="row justify-content-center w-100">
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-body p-5">
+          <h2 class="card-title text-center mb-4 fw-bold">Iniciar Sesión</h2>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- RUT Field -->
-      <div class="form-group">
-        <label for="rut">RUT</label>
-        <input
-          type="text"
-          id="rut"
-          formControlName="rut"
-          placeholder="12345678-9"
-          [class.error]="loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched">
-        <div class="error-message" *ngIf="loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched">
-          {{ getErrorMessage('rut') }}
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- RUT Field -->
+            <div class="mb-3">
+              <label for="rut" class="form-label fw-semibold">RUT</label>
+              <input
+                type="text"
+                id="rut"
+                formControlName="rut"
+                class="form-control form-control-lg"
+                [class.is-invalid]="loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched"
+                placeholder="12345678-9">
+              @if (loginForm.get('rut')?.invalid && loginForm.get('rut')?.touched) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('rut') }}
+                </div>
+              }
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-4">
+              <label for="contrasenia" class="form-label fw-semibold">Contraseña</label>
+              <input
+                type="password"
+                id="contrasenia"
+                formControlName="contrasenia"
+                class="form-control form-control-lg"
+                [class.is-invalid]="loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched"
+                placeholder="Ingrese su contraseña">
+              @if (loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('contrasenia') }}
+                </div>
+              }
+            </div>
+
+            <!-- Error Message -->
+            @if (errorMessage) {
+              <div class="alert alert-danger py-2 mb-3">
+                {{ errorMessage }}
+              </div>
+            }
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg w-100 fw-semibold"
+              [disabled]="isLoading">
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Iniciando sesión...
+              } @else {
+                Iniciar Sesión
+              }
+            </button>
+          </form>
         </div>
       </div>
-
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="contrasenia">Contraseña</label>
-        <input
-          type="password"
-          id="contrasenia"
-          formControlName="contrasenia"
-          placeholder="Ingrese su contraseña"
-          [class.error]="loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched">
-        <div class="error-message" *ngIf="loginForm.get('contrasenia')?.invalid && loginForm.get('contrasenia')?.touched">
-          {{ getErrorMessage('contrasenia') }}
-        </div>
-      </div>
-
-      <!-- Error Message -->
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        class="login-btn"
-        [disabled]="isLoading">
-        <span *ngIf="isLoading">Iniciando sesión...</span>
-        <span *ngIf="!isLoading">Iniciar Sesión</span>
-      </button>
-    </form>
+    </div>
   </div>
 </div>

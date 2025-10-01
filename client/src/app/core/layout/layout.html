@@ -1,0 +1,73 @@
+<div class="min-vh-100 d-flex flex-column">
+  <!-- Header - Solo visible cuando el usuario está autenticado y NO estamos en login -->
+  @if (currentUser && !isLoginPage()) {
+    <header class="bg-primary text-white py-3 shadow-sm sticky-top">
+      <div class="container px-3">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <h1 class="h4 mb-0 fw-bold">Mesa de Ayuda</h1>
+          </div>
+
+          <div class="col-md-6 text-center">
+            <!-- Navegación principal -->
+            <nav class="navbar navbar-expand-md p-0">
+              <ul class="navbar-nav mx-auto flex-row gap-2">
+                <li class="nav-item">
+                  <a
+                    routerLink="/dashboard"
+                    class="nav-link text-white px-3 py-2 rounded"
+                    [class.active]="isActiveRoute('/dashboard')"
+                    routerLinkActive="bg-white bg-opacity-25">
+                    🏠 Dashboard
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    routerLink="/tickets"
+                    class="nav-link text-white px-3 py-2 rounded"
+                    [class.active]="isActiveRoute('/tickets')"
+                    routerLinkActive="bg-white bg-opacity-25">
+                    📋 Tickets
+                  </a>
+                </li>
+                @if (currentUser?.rol === 'Administrador') {
+                  <li class="nav-item">
+                    <a
+                      routerLink="/users"
+                      class="nav-link text-white px-3 py-2 rounded"
+                      [class.active]="isActiveRoute('/users')"
+                      routerLinkActive="bg-white bg-opacity-25">
+                      👥 Usuarios
+                    </a>
+                  </li>
+                }
+                <li class="nav-item">
+                  <a
+                    routerLink="/profile"
+                    class="nav-link text-white px-3 py-2 rounded"
+                    [class.active]="isActiveRoute('/profile')"
+                    routerLinkActive="bg-white bg-opacity-25">
+                    👤 Mi Perfil
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <div class="col-md-3 text-end">
+            <button class="btn btn-outline-light btn-sm" (click)="logout()">
+              🚪 Salir
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  }
+
+  <!-- Contenido principal -->
+  <main class="flex-grow-1 bg-light">
+    <div class="container-fluid p-0">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

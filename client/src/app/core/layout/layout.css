@@ -1,0 +1,17 @@
+/* Estilos adicionales para el layout que no están en Bootstrap */
+.nav-link.active {
+  font-weight: 600;
+}
+
+/* Responsive adicional */
+@media (max-width: 576px) {
+  .navbar-nav {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .nav-link {
+    text-align: center;
+    padding: 0.5rem 1rem !important;
+  }
+}

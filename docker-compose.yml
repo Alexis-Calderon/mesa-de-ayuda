@@ -1,10 +1,9 @@
 services:
+  # API Backend (.NET 9)
   mesa-de-ayuda-api:
     build:
       context: ./backend
       dockerfile: src/MesaDeAyuda.Api/Dockerfile
-    ports:
-      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
@@ -17,6 +16,26 @@ services:
       - mesa-ayuda-data:/app/App_Data
     networks:
       - mesa-ayuda-network
+    # No exponemos el puerto 8080 externamente
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Angular con Nginx
+  web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"  # Exponemos solo el puerto del frontend
+    depends_on:
+      - mesa-de-ayuda-api
+    networks:
+      - mesa-ayuda-network
+    restart: unless-stopped
 
 volumes:
   mesa-ayuda-data:

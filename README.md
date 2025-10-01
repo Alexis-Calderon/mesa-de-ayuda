@@ -48,15 +48,20 @@ Al iniciar la aplicación por primera vez, se crea automáticamente un usuario a
 ### Opción 1: Usando Docker Compose (Recomendado)
 
 ```bash
-# Construir e iniciar la API
+# Construir e iniciar todos los servicios (API + Frontend)
 docker-compose up --build
 
 # O usando la nueva sintaxis de Docker Compose v2
 docker compose up --build
 
-# La API estará disponible en http://localhost:8080
-# Swagger UI: http://localhost:8080/swagger
+# La aplicación completa estará disponible en http://localhost:8080
+# API interna disponible en http://localhost:8080/api/
 ```
+
+### Servicios Incluidos:
+- **Frontend (Angular)**: `http://localhost:8080` - Interfaz de usuario
+- **Backend (API .NET)**: `http://localhost:8080/api/` - API REST (accesible vía proxy)
+- **Base de Datos**: SQLite persistente en volumen Docker
 
 ### Opción 2: Construir imagen manualmente
 

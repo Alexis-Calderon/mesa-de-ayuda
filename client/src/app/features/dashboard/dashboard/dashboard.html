@@ -1,97 +1,135 @@
-<div class="dashboard-container">
-  <!-- Header -->
-  <header class="dashboard-header">
-    <div class="header-content">
-      <h1>Mesa de Ayuda</h1>
-      <div class="user-info">
-        <span *ngIf="currentUser">Bienvenido, {{ currentUser.nombre }} ({{ getRoleDisplayName(currentUser.rol) }})</span>
-        <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="dashboard-main">
-    <!-- Stats Cards -->
-    <div class="stats-grid" *ngIf="!isLoading">
-      <div class="stat-card">
-        <div class="stat-icon total">📊</div>
-        <div class="stat-content">
-          <h3>{{ stats.totalTickets }}</h3>
-          <p>Total de Tickets</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon open">🔴</div>
-        <div class="stat-content">
-          <h3>{{ stats.ticketsAbiertos }}</h3>
-          <p>Tickets Abiertos</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon review">🟡</div>
-        <div class="stat-content">
-          <h3>{{ stats.ticketsRevision }}</h3>
-          <p>En Revisión</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon resolved">🟢</div>
-        <div class="stat-content">
-          <h3>{{ stats.ticketsResueltos }}</h3>
-          <p>Resueltos</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading -->
-    <div class="loading" *ngIf="isLoading">
-      <p>Cargando datos del dashboard...</p>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="actions-section">
-      <h2>Acciones Rápidas</h2>
-      <div class="action-buttons">
-        <a routerLink="/tickets/create" class="action-btn primary" *ngIf="currentUser?.rol === 3">
-          <span>➕</span> Crear Nuevo Ticket
-        </a>
-        <a routerLink="/tickets" class="action-btn secondary">
-          <span>📋</span> Ver Todos los Tickets
-        </a>
-        <a routerLink="/users" class="action-btn admin" *ngIf="currentUser?.rol === 1">
-          <span>👥</span> Gestionar Usuarios
-        </a>
-      </div>
-    </div>
-
-    <!-- Recent Tickets -->
-    <div class="recent-tickets" *ngIf="!isLoading && recentTickets.length > 0">
-      <h2>Tickets Recientes</h2>
-      <div class="tickets-list">
-        <div class="ticket-item" *ngFor="let ticket of recentTickets">
-          <div class="ticket-header">
-            <span class="ticket-id">#{{ ticket.id }}</span>
-            <span class="ticket-status" [ngClass]="getStatusColor(ticket.estado)">
-              {{ ticket.estado }}
-            </span>
+<div class="container-fluid py-4">
+  <div class="container">
+    <!-- Main Content -->
+    <main>
+      <!-- Stats Cards -->
+      @if (!isLoading) {
+        <div class="row g-4 mb-5">
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-primary mb-2">📊</div>
+                <h2 class="card-title h1 mb-1">{{ stats.totalTickets }}</h2>
+                <p class="card-text text-muted">Total de Tickets</p>
+              </div>
+            </div>
           </div>
-          <div class="ticket-content">
-            <h4>{{ ticket.descripcion }}</h4>
-            <p class="ticket-meta">
-              <span>👤 {{ ticket.usuarioRutCreadorNavigation.nombre }}</span>
-              <span>📅 {{ ticket.fechaCreacion | date:'short' }}</span>
-              <span *ngIf="ticket.usuarioRutTecnicoNavigation">
-                🔧 {{ ticket.usuarioRutTecnicoNavigation.nombre }}
-              </span>
-            </p>
+
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-danger mb-2">🔴</div>
+                <h2 class="card-title h1 mb-1">{{ stats.ticketsAbiertos }}</h2>
+                <p class="card-text text-muted">Tickets Abiertos</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-warning mb-2">🟡</div>
+                <h2 class="card-title h1 mb-1">{{ stats.ticketsRevision }}</h2>
+                <p class="card-text text-muted">En Revisión</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <div class="display-4 text-success mb-2">🟢</div>
+                <h2 class="card-title h1 mb-1">{{ stats.ticketsResueltos }}</h2>
+                <p class="card-text text-muted">Resueltos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Loading -->
+      @if (isLoading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando datos del dashboard...</span>
+          </div>
+          <p class="mt-3 text-muted">Cargando datos del dashboard...</p>
+        </div>
+      }
+
+      <!-- Quick Actions -->
+      <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Acciones Rápidas</h3>
+          <div class="row g-3">
+            @if (currentUser?.rol === 'Cliente') {
+              <div class="col-md-4">
+                <a routerLink="/tickets/create" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
+                  <span>➕</span> Crear Nuevo Ticket
+                </a>
+              </div>
+            }
+            <div class="col-md-4">
+              <a routerLink="/tickets" class="btn btn-outline-secondary btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
+                <span>📋</span> Ver Todos los Tickets
+              </a>
+            </div>
+            @if (currentUser?.rol === 'Administrador') {
+              <div class="col-md-4">
+                <a routerLink="/users" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
+                  <span>👥</span> Gestionar Usuarios
+                </a>
+              </div>
+            }
           </div>
         </div>
       </div>
-      <a routerLink="/tickets" class="view-all-link">Ver todos los tickets →</a>
-    </div>
-  </main>
+
+      <!-- Recent Tickets -->
+      @if (!isLoading && recentTickets.length > 0) {
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title mb-4">Tickets Recientes</h3>
+            <div class="row g-3">
+              @for (ticket of recentTickets; track ticket.id) {
+                <div class="col-12">
+                  <div class="card border h-100">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                          <h5 class="card-title mb-1">#{{ ticket.id }}</h5>
+                          <span class="badge" [class]="'bg-' + getStatusColor(ticket.estado)">
+                            {{ ticket.estado }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <h6 class="card-subtitle mb-3 text-muted">{{ ticket.descripcion }}</h6>
+
+                      <div class="row text-sm">
+                        <div class="col-md-4">
+                          <small class="text-muted">👤 {{ ticket.usuarioRutCreadorNavigation.nombre }}</small>
+                        </div>
+                        <div class="col-md-4">
+                          <small class="text-muted">📅 {{ ticket.fechaCreacion | date:'short' }}</small>
+                        </div>
+                        <div class="col-md-4">
+                          @if (ticket.usuarioRutTecnicoNavigation) {
+                            <small class="text-muted">🔧 {{ ticket.usuarioRutTecnicoNavigation.nombre }}</small>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="text-center mt-4">
+              <a routerLink="/tickets" class="btn btn-outline-primary">Ver todos los tickets →</a>
+            </div>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
 </div>

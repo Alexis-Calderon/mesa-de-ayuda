@@ -1,0 +1,183 @@
+<div class="container-fluid py-4">
+  <div class="container">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h1 class="h2 mb-2">Mi Perfil</h1>
+      <p class="text-muted">Administra tu información personal</p>
+    </div>
+
+    <!-- Current User Info -->
+    @if (currentUser) {
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h3 class="card-title h5 mb-3 text-primary">Información Actual</h3>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded">
+                <small class="text-muted d-block">RUT</small>
+                <strong class="fs-6">{{ currentUser?.rut }}</strong>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded">
+                <small class="text-muted d-block">Rol</small>
+                <span class="badge fs-6" [class]="'bg-' + (currentUser?.rol === 'Administrador' ? 'primary' : currentUser?.rol === 'Técnico' ? 'info' : 'secondary')">
+                  {{ getRoleName(currentUser?.rol || '') }}
+                </span>
+              </div>
+            </div>
+            @if (currentUser?.fechaCreacion) {
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                  <small class="text-muted d-block">Miembro desde</small>
+                  <strong class="fs-6">{{ currentUser.fechaCreacion | date:'dd/MM/yyyy' }}</strong>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Profile Form -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <!-- Personal Information -->
+          <div class="mb-4">
+            <h3 class="h5 mb-3 text-primary">Información Personal</h3>
+
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-semibold">Nombre completo *</label>
+              <input
+                type="text"
+                id="nombre"
+                formControlName="nombre"
+                class="form-control form-control-lg"
+                [class.is-invalid]="getFieldError('nombre')"
+                placeholder="Ingresa tu nombre completo">
+              @if (getFieldError('nombre')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('nombre') }}
+                </div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Correo electrónico *</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-control form-control-lg"
+                [class.is-invalid]="getFieldError('email')"
+                placeholder="Ingresa tu correo electrónico">
+              @if (getFieldError('email')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('email') }}
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Password Section -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="h5 mb-0 text-primary">Cambiar Contraseña</h3>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="togglePasswordFields()">
+                {{ showPasswordFields ? 'Cancelar cambio' : 'Cambiar contraseña' }}
+              </button>
+            </div>
+
+            @if (showPasswordFields) {
+              <div class="border rounded p-3 bg-light">
+                <div class="mb-3">
+                  <label for="currentContrasenia" class="form-label fw-semibold">Contraseña actual *</label>
+                  <input
+                    type="password"
+                    id="currentContrasenia"
+                    formControlName="currentContrasenia"
+                    class="form-control"
+                    [class.is-invalid]="getFieldError('currentContrasenia')"
+                    placeholder="Ingresa tu contraseña actual">
+                  @if (getFieldError('currentContrasenia')) {
+                    <div class="invalid-feedback">
+                      {{ getFieldError('currentContrasenia') }}
+                    </div>
+                  }
+                </div>
+
+                <div class="mb-3">
+                  <label for="newContrasenia" class="form-label fw-semibold">Nueva contraseña *</label>
+                  <input
+                    type="password"
+                    id="newContrasenia"
+                    formControlName="newContrasenia"
+                    class="form-control"
+                    [class.is-invalid]="getFieldError('newContrasenia')"
+                    placeholder="Ingresa tu nueva contraseña">
+                  @if (getFieldError('newContrasenia')) {
+                    <div class="invalid-feedback">
+                      {{ getFieldError('newContrasenia') }}
+                    </div>
+                  }
+                  <div class="form-text">
+                    La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="confirmNewContrasenia" class="form-label fw-semibold">Confirmar nueva contraseña *</label>
+                  <input
+                    type="password"
+                    id="confirmNewContrasenia"
+                    formControlName="confirmNewContrasenia"
+                    class="form-control"
+                    [class.is-invalid]="getFieldError('confirmNewContrasenia')"
+                    placeholder="Confirma tu nueva contraseña">
+                  @if (getFieldError('confirmNewContrasenia')) {
+                    <div class="invalid-feedback">
+                      {{ getFieldError('confirmNewContrasenia') }}
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Messages -->
+          <div class="mb-4">
+            @if (successMessage) {
+              <div class="alert alert-success d-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ successMessage }}
+              </div>
+            }
+            @if (errorMessage) {
+              <div class="alert alert-danger d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ errorMessage }}
+              </div>
+            }
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-end">
+            <button
+              type="submit"
+              class="btn btn-primary px-4"
+              [disabled]="profileForm.invalid || isLoading">
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Guardando...
+              } @else {
+                <i class="bi bi-check-circle me-2"></i>
+                Guardar Cambios
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

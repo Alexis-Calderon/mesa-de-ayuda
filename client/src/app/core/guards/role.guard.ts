@@ -12,7 +12,7 @@ export class RoleGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    const requiredRoles = route.data['roles'] as number[];
+    const requiredRoles = route.data['roles'] as string[];
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;

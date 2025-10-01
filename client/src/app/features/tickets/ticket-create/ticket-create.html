@@ -1,109 +1,149 @@
-<div class="ticket-create-container">
-  <div class="header">
-    <h1>Crear Nuevo Ticket</h1>
-    <button class="btn-secondary" (click)="onCancel()">← Volver</button>
-  </div>
+<div class="container-fluid py-4">
+  <div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">Crear Nuevo Ticket</h1>
+      <button class="btn btn-outline-secondary" (click)="onCancel()">
+        <i class="bi bi-arrow-left me-2"></i>Volver
+      </button>
+    </div>
 
-  <div class="form-card">
-    <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
-      <div class="form-section">
-        <h3>Información del Ticket</h3>
+    <!-- Form Card -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
+          <!-- Información del Ticket -->
+          <div class="mb-4">
+            <h3 class="h5 mb-3 text-primary">Información del Ticket</h3>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="tipo">Tipo de Ticket</label>
-            <select id="tipo" formControlName="tipo" [class.error]="createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched">
-              <option *ngFor="let option of tipoOptions" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="error-message" *ngIf="createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched">
-              {{ getErrorMessage('tipo') }}
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="tipo" class="form-label fw-semibold">Tipo de Ticket</label>
+                <select id="tipo" formControlName="tipo" class="form-select"
+                        [class.is-invalid]="createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched">
+                  @for (option of tipoOptions; track option.value) {
+                    <option [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+                @if (createForm.get('tipo')?.invalid && createForm.get('tipo')?.touched) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('tipo') }}
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-4">
+                <label for="prioridad" class="form-label fw-semibold">Prioridad</label>
+                <select id="prioridad" formControlName="prioridad" class="form-select"
+                        [class.is-invalid]="createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched">
+                  @for (option of prioridadOptions; track option.value) {
+                    <option [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+                @if (createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('prioridad') }}
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-4">
+                <label for="area" class="form-label fw-semibold">Área Afectada</label>
+                <select id="area" formControlName="area" class="form-select"
+                        [class.is-invalid]="createForm.get('area')?.invalid && createForm.get('area')?.touched">
+                  <option value="">Seleccionar área</option>
+                  @for (option of areaOptions; track option.value) {
+                    <option [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+                @if (createForm.get('area')?.invalid && createForm.get('area')?.touched) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('area') }}
+                  </div>
+                }
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="prioridad">Prioridad</label>
-            <select id="prioridad" formControlName="prioridad" [class.error]="createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched">
-              <option *ngFor="let option of prioridadOptions" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="error-message" *ngIf="createForm.get('prioridad')?.invalid && createForm.get('prioridad')?.touched">
-              {{ getErrorMessage('prioridad') }}
+          <!-- Descripción del Problema -->
+          <div class="mb-4">
+            <h3 class="h5 mb-3 text-primary">Descripción del Problema</h3>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label fw-semibold">Descripción Breve</label>
+              <input
+                type="text"
+                id="descripcion"
+                formControlName="descripcion"
+                class="form-control"
+                [class.is-invalid]="createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched"
+                placeholder="Resuma el problema en una frase">
+              @if (createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('descripcion') }}
+                </div>
+              }
+              <div class="form-text">
+                Máximo 100 caracteres. Sea específico y claro.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="observaciones" class="form-label fw-semibold">Observaciones Detalladas</label>
+              <textarea
+                id="observaciones"
+                formControlName="observaciones"
+                rows="6"
+                class="form-control"
+                [class.is-invalid]="createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched"
+                placeholder="Describa detalladamente el problema, incluyendo pasos para reproducirlo, impacto en el trabajo, etc.">
+              </textarea>
+              @if (createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('observaciones') }}
+                </div>
+              }
+              <div class="form-text">
+                Máximo 500 caracteres. Incluya toda la información relevante para que el técnico pueda resolver el problema.
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="area">Área Afectada</label>
-            <select id="area" formControlName="area" [class.error]="createForm.get('area')?.invalid && createForm.get('area')?.touched">
-              <option value="">Seleccionar área</option>
-              <option *ngFor="let option of areaOptions" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="error-message" *ngIf="createForm.get('area')?.invalid && createForm.get('area')?.touched">
-              {{ getErrorMessage('area') }}
-            </div>
+          <!-- Form Actions -->
+          <div class="d-flex gap-3 justify-content-end">
+            <button type="button" class="btn btn-outline-secondary px-4" (click)="onCancel()">Cancelar</button>
+            <button type="submit" class="btn btn-primary px-4" [disabled]="isLoading || createForm.invalid">
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Creando Ticket...
+              } @else {
+                <i class="bi bi-plus-circle me-2"></i>
+                Crear Ticket
+              }
+            </button>
           </div>
-        </div>
+        </form>
       </div>
+    </div>
 
-      <div class="form-section">
-        <h3>Descripción del Problema</h3>
-
-        <div class="form-group">
-          <label for="descripcion">Descripción Breve</label>
-          <input
-            type="text"
-            id="descripcion"
-            formControlName="descripcion"
-            placeholder="Resuma el problema en una frase"
-            [class.error]="createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched">
-          <div class="error-message" *ngIf="createForm.get('descripcion')?.invalid && createForm.get('descripcion')?.touched">
-            {{ getErrorMessage('descripcion') }}
-          </div>
-          <small class="help-text">
-            Máximo 100 caracteres. Sea específico y claro.
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="observaciones">Observaciones Detalladas</label>
-          <textarea
-            id="observaciones"
-            formControlName="observaciones"
-            rows="6"
-            placeholder="Describa detalladamente el problema, incluyendo pasos para reproducirlo, impacto en el trabajo, etc."
-            [class.error]="createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched">
-          </textarea>
-          <div class="error-message" *ngIf="createForm.get('observaciones')?.invalid && createForm.get('observaciones')?.touched">
-            {{ getErrorMessage('observaciones') }}
-          </div>
-          <small class="help-text">
-            Máximo 500 caracteres. Incluya toda la información relevante para que el técnico pueda resolver el problema.
-          </small>
-        </div>
+    <!-- Info Card -->
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-body">
+        <h4 class="card-title text-primary">💡 Consejos para crear un buen ticket</h4>
+        <ul class="list-unstyled">
+          <li class="mb-2"><strong>Sea específico:</strong> Describa exactamente qué problema está experimentando</li>
+          <li class="mb-2"><strong>Incluya contexto:</strong> Mencione qué estaba haciendo cuando ocurrió el problema</li>
+          <li class="mb-2"><strong>Proporcione pasos:</strong> Si es posible, indique cómo reproducir el problema</li>
+          <li class="mb-2"><strong>Especifique impacto:</strong> Indique cómo afecta esto su trabajo</li>
+          <li class="mb-0"><strong>Adjunte evidencia:</strong> Si tiene capturas de pantalla o logs, inclúyalos en las observaciones</li>
+        </ul>
       </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="isLoading || createForm.invalid">
-          <span *ngIf="isLoading">Creando Ticket...</span>
-          <span *ngIf="!isLoading">Crear Ticket</span>
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <div class="info-card">
-    <h4>💡 Consejos para crear un buen ticket</h4>
-    <ul>
-      <li><strong>Sea específico:</strong> Describa exactamente qué problema está experimentando</li>
-      <li><strong>Incluya contexto:</strong> Mencione qué estaba haciendo cuando ocurrió el problema</li>
-      <li><strong>Proporcione pasos:</strong> Si es posible, indique cómo reproducir el problema</li>
-      <li><strong>Especifique impacto:</strong> Indique cómo afecta esto su trabajo</li>
-      <li><strong>Adjunte evidencia:</strong> Si tiene capturas de pantalla o logs, inclúyalos en las observaciones</li>
-    </ul>
+    </div>
   </div>
 </div>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MesaDeAyuda.Data.Dtos.Contracts;
 using MesaDeAyuda.Data.Interfaces.UseCases;
 using MesaDeAyuda.Domain.Entities;
+using MesaDeAyuda.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +55,7 @@ public class AuthController : ControllerBase
                     usuario.Rut,
                     usuario.Nombre,
                     usuario.Email,
-                    Rol = (int)usuario.Rol,
+                    usuario.Rol,
                 },
             }
         );
@@ -67,6 +68,13 @@ public class AuthController : ControllerBase
         // En una implementación real, podrías invalidar el token en una blacklist
         // Por simplicidad, solo devolvemos OK
         return Ok("Sesión cerrada exitosamente");
+    }
+
+    [HttpGet("health")]
+    [AllowAnonymous]
+    public IActionResult Health()
+    {
+        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
     }
 
     private string GenerateJwtToken(Usuario usuario)

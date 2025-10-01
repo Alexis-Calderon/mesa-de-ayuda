@@ -25,29 +25,29 @@ export class UserManagement implements OnInit {
 
   // Mapa de roles para conversión
   roleMap = {
-    'Cliente': 3,
-    'Técnico': 2
+    'Cliente': 'Cliente',
+    'Técnico': 'Técnico'
   };
 
   reverseRoleMap = {
-    3: 'Cliente',
-    2: 'Técnico',
-    1: 'Administrador'
+    'Cliente': 'Cliente',
+    'Técnico': 'Técnico',
+    'Administrador': 'Administrador'
   };
 
   constructor() {
     this.createForm = this.fb.group({
-      rut: ['', [Validators.required, Validators.pattern(/^\d{7,8}-[\dkK]$/)]],
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      rol: [3, [Validators.required]], // Cliente por defecto
+      rut: ['', [Validators.required, Validators.maxLength(12), Validators.pattern(/^(0*(\d{1,3}(\.?\d{3})*)\-?([\dkK]))$/)]],
+      nombre: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+      rol: ['Cliente', [Validators.required]], // Cliente por defecto
       contrasenia: ['', [Validators.required, Validators.minLength(6)]]
     });
 
     this.editForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      rol: [3, [Validators.required]]
+      nombre: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+      rol: ['Cliente', [Validators.required]]
     });
   }
 
@@ -157,15 +157,15 @@ export class UserManagement implements OnInit {
     });
   }
 
-  getRoleDisplayName(role: number): string {
+  getRoleDisplayName(role: string): string {
     return this.reverseRoleMap[role as keyof typeof this.reverseRoleMap] || 'Desconocido';
   }
 
-  getRoleColor(role: number): string {
+  getRoleColor(role: string): string {
     switch (role) {
-      case 1: return 'role-admin';
-      case 2: return 'role-tech';
-      case 3: return 'role-client';
+      case 'Administrador': return 'role-admin';
+      case 'Técnico': return 'role-tech';
+      case 'Cliente': return 'role-client';
       default: return '';
     }
   }

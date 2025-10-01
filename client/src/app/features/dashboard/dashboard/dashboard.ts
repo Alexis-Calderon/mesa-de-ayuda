@@ -54,9 +54,7 @@ export class Dashboard implements OnInit {
     this.stats.ticketsAsignados = tickets.filter(t => t.usuarioRutTecnicoNavigation).length;
   }
 
-  logout(): void {
-    this.authService.logout();
-  }
+  // El logout ahora se maneja en el componente Layout
 
   getRoleDisplayName(role: number): string {
     switch (role) {

@@ -9,7 +9,7 @@ export interface AuthResponse {
     rut: string;
     nombre: string;
     email: string;
-    rol: number;
+    rol: string;
   };
 }
 
@@ -17,6 +17,6 @@ export interface Usuario {
   rut: string;
   nombre: string;
   email: string;
-  rol: number;
+  rol: string;
   fechaCreacion?: string;
 }

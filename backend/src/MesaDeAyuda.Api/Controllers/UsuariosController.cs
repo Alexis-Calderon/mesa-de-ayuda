@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using Mapster;
+using MesaDeAyuda.Data.Common.Helpers;
 using MesaDeAyuda.Data.Dtos.Usuario;
 using MesaDeAyuda.Data.Interfaces.UseCases;
 using MesaDeAyuda.Domain.Entities;
@@ -46,13 +49,27 @@ public class UsuariosController(IUsuarioUseCases usuarioUseCases) : ControllerBa
         if (existing != null)
             return BadRequest("El RUT ya está registrado");
 
+        // Verificación adicional para rol administrador
+        if (dto.Rol == Domain.Enums.Rol.Administrador && dto.Rut != SystemConstants.DefaultAdminRut)
+        {
+            return BadRequest(
+                "No se pueden crear múltiples usuarios administradores. El sistema solo permite un administrador por defecto."
+            );
+        }
+
         var usuario = dto.Adapt<Usuario>();
         usuario.Contrasenia = BCrypt.Net.BCrypt.HashPassword(dto.Contrasenia);
 
-        var created = await _usuarioUseCases.CreateUsuarioAsync(usuario);
-        var response = created.Adapt<UsuarioResponseDto>();
-
-        return CreatedAtAction(nameof(GetUsuario), new { rut = response.Rut }, response);
+        try
+        {
+            var created = await _usuarioUseCases.CreateUsuarioAsync(usuario);
+            var response = created.Adapt<UsuarioResponseDto>();
+            return CreatedAtAction(nameof(GetUsuario), new { rut = response.Rut }, response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{rut}")]
@@ -61,23 +78,51 @@ public class UsuariosController(IUsuarioUseCases usuarioUseCases) : ControllerBa
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+        // Verificación especial para el administrador por defecto
+        if (rut == SystemConstants.DefaultAdminRut && dto.Rol != Domain.Enums.Rol.Administrador)
+        {
+            return BadRequest("No se puede cambiar el rol del administrador por defecto.");
+        }
+
         var usuario = dto.Adapt<Usuario>();
-        var updated = await _usuarioUseCases.UpdateUsuarioAsync(rut, usuario);
 
-        if (updated == null)
-            return NotFound("Usuario no encontrado");
+        try
+        {
+            var updated = await _usuarioUseCases.UpdateUsuarioAsync(rut, usuario);
 
-        var response = updated.Adapt<UsuarioResponseDto>();
-        return Ok(response);
+            if (updated == null)
+                return NotFound("Usuario no encontrado");
+
+            var response = updated.Adapt<UsuarioResponseDto>();
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{rut}")]
     public async Task<IActionResult> DeleteUsuario(string rut)
     {
-        var deleted = await _usuarioUseCases.DeleteUsuarioAsync(rut);
-        if (!deleted)
-            return NotFound("Usuario no encontrado");
+        // Verificación especial para el administrador por defecto
+        if (rut == SystemConstants.DefaultAdminRut)
+        {
+            return BadRequest("No se puede eliminar el usuario administrador por defecto.");
+        }
 
-        return NoContent();
+        try
+        {
+            var deleted = await _usuarioUseCases.DeleteUsuarioAsync(rut);
+            if (!deleted)
+                return NotFound("Usuario no encontrado");
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
+
 }

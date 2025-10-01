@@ -1,169 +1,244 @@
-<div class="user-management-container">
-  <div class="header">
-    <h1>Gestión de Usuarios</h1>
-    <button class="btn-primary" (click)="toggleCreateForm()" *ngIf="!showCreateForm">
-      <span>+</span> Nuevo Usuario
-    </button>
-  </div>
-
-  <!-- Create User Form -->
-  <div class="form-card" *ngIf="showCreateForm">
-    <h3>Crear Nuevo Usuario</h3>
-    <form [formGroup]="createForm" (ngSubmit)="onCreateUser()">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rut">RUT</label>
-          <input
-            type="text"
-            id="rut"
-            formControlName="rut"
-            placeholder="12345678-9"
-            [class.error]="createForm.get('rut')?.invalid && createForm.get('rut')?.touched">
-          <div class="error-message" *ngIf="createForm.get('rut')?.invalid && createForm.get('rut')?.touched">
-            RUT inválido (formato: 12345678-9)
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input
-            type="text"
-            id="nombre"
-            formControlName="nombre"
-            placeholder="Nombre completo"
-            [class.error]="createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched">
-          <div class="error-message" *ngIf="createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched">
-            Nombre requerido (mínimo 2 caracteres)
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="usuario@empresa.com"
-            [class.error]="createForm.get('email')?.invalid && createForm.get('email')?.touched">
-          <div class="error-message" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">
-            Email inválido
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="rol">Rol</label>
-          <select id="rol" formControlName="rol">
-            <option [value]="3">Cliente</option>
-            <option [value]="2">Técnico</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="contrasenia">Contraseña</label>
-        <input
-          type="password"
-          id="contrasenia"
-          formControlName="contrasenia"
-          placeholder="Contraseña"
-          [class.error]="createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched">
-        <div class="error-message" *ngIf="createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched">
-          Contraseña requerida (mínimo 6 caracteres)
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="toggleCreateForm()">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="isLoading">
-          <span *ngIf="isLoading">Creando...</span>
-          <span *ngIf="!isLoading">Crear Usuario</span>
+<div class="container-fluid py-4">
+  <div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">Gestión de Usuarios</h1>
+      @if (!showCreateForm) {
+        <button class="btn btn-primary" (click)="toggleCreateForm()">
+          <i class="bi bi-plus-circle me-2"></i>Nuevo Usuario
         </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Edit User Form -->
-  <div class="form-card" *ngIf="editingUser">
-    <h3>Editar Usuario: {{ editingUser.nombre }}</h3>
-    <form [formGroup]="editForm" (ngSubmit)="onUpdateUser()">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="edit-nombre">Nombre</label>
-          <input
-            type="text"
-            id="edit-nombre"
-            formControlName="nombre"
-            [class.error]="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
-          <div class="error-message" *ngIf="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
-            Nombre requerido (mínimo 2 caracteres)
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="edit-rol">Rol</label>
-          <select id="edit-rol" formControlName="rol">
-            <option [value]="3">Cliente</option>
-            <option [value]="2">Técnico</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="edit-email">Email</label>
-        <input
-          type="email"
-          id="edit-email"
-          formControlName="email"
-          [class.error]="editForm.get('email')?.invalid && editForm.get('email')?.touched">
-        <div class="error-message" *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
-          Email inválido
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="cancelEdit()">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="isLoading">
-          <span *ngIf="isLoading">Actualizando...</span>
-          <span *ngIf="!isLoading">Actualizar Usuario</span>
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Users List -->
-  <div class="users-list">
-    <div class="loading" *ngIf="isLoading && users.length === 0">
-      <p>Cargando usuarios...</p>
+      }
     </div>
 
-    <div class="user-card" *ngFor="let user of users">
-      <div class="user-info">
-        <div class="user-header">
-          <h4>{{ user.nombre }}</h4>
-          <span class="user-role" [ngClass]="getRoleColor(user.rol)">
-            {{ getRoleDisplayName(user.rol) }}
-          </span>
-        </div>
-        <div class="user-details">
-          <p><strong>RUT:</strong> {{ user.rut }}</p>
-          <p><strong>Email:</strong> {{ user.email }}</p>
-          <p><strong>Fecha de creación:</strong> {{ user.fechaCreacion | date:'short' }}</p>
-        </div>
-      </div>
-      <div class="user-actions">
-        <button class="btn-edit" (click)="startEditUser(user)" [disabled]="isLoading">
-          ✏️ Editar
-        </button>
-        <button class="btn-delete" (click)="deleteUser(user)" [disabled]="isLoading">
-          🗑️ Eliminar
-        </button>
-      </div>
-    </div>
+    <!-- Create User Form -->
+    @if (showCreateForm) {
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h3 class="card-title h5 mb-4">Crear Nuevo Usuario</h3>
+          <form [formGroup]="createForm" (ngSubmit)="onCreateUser()">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="rut" class="form-label fw-semibold">RUT</label>
+                <input
+                  type="text"
+                  id="rut"
+                  formControlName="rut"
+                  class="form-control"
+                  [class.is-invalid]="createForm.get('rut')?.invalid && createForm.get('rut')?.touched"
+                  placeholder="12345678-9">
+                @if (createForm.get('rut')?.invalid && createForm.get('rut')?.touched) {
+                  <div class="invalid-feedback">
+                    El RUT no es válido.
+                  </div>
+                }
+              </div>
 
-    <div class="no-users" *ngIf="!isLoading && users.length === 0">
-      <p>No hay usuarios registrados.</p>
+              <div class="col-md-6">
+                <label for="nombre" class="form-label fw-semibold">Nombre</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  formControlName="nombre"
+                  class="form-control"
+                  [class.is-invalid]="createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched"
+                  placeholder="Nombre completo">
+                @if (createForm.get('nombre')?.invalid && createForm.get('nombre')?.touched) {
+                  <div class="invalid-feedback">
+                    El nombre es requerido.
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="email" class="form-label fw-semibold">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.is-invalid]="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+                  placeholder="usuario@empresa.com">
+                @if (createForm.get('email')?.invalid && createForm.get('email')?.touched) {
+                  <div class="invalid-feedback">
+                    El email no es válido.
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label for="rol" class="form-label fw-semibold">Rol</label>
+                <select id="rol" formControlName="rol" class="form-select">
+                  <option value="Cliente">Cliente</option>
+                  <option value="Técnico">Técnico</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="contrasenia" class="form-label fw-semibold">Contraseña</label>
+              <input
+                type="password"
+                id="contrasenia"
+                formControlName="contrasenia"
+                class="form-control"
+                [class.is-invalid]="createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched"
+                placeholder="Contraseña">
+              @if (createForm.get('contrasenia')?.invalid && createForm.get('contrasenia')?.touched) {
+                <div class="invalid-feedback">
+                  La contraseña es requerida.
+                </div>
+              }
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end">
+              <button type="button" class="btn btn-outline-secondary px-4" (click)="toggleCreateForm()">Cancelar</button>
+              <button type="submit" class="btn btn-primary px-4" [disabled]="isLoading">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Creando...
+                } @else {
+                  <i class="bi bi-person-plus me-2"></i>
+                  Crear Usuario
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- Edit User Form -->
+    @if (editingUser) {
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h3 class="card-title h5 mb-4">Editar Usuario: {{ editingUser.nombre }}</h3>
+          <form [formGroup]="editForm" (ngSubmit)="onUpdateUser()">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-nombre" class="form-label fw-semibold">Nombre</label>
+                <input
+                  type="text"
+                  id="edit-nombre"
+                  formControlName="nombre"
+                  class="form-control"
+                  [class.is-invalid]="editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched">
+                @if (editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched) {
+                  <div class="invalid-feedback">
+                    El nombre es requerido.
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label for="edit-rol" class="form-label fw-semibold">Rol</label>
+                <select id="edit-rol" formControlName="rol" class="form-select">
+                  <option value="Cliente">Cliente</option>
+                  <option value="Técnico">Técnico</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="edit-email" class="form-label fw-semibold">Email</label>
+              <input
+                type="email"
+                id="edit-email"
+                formControlName="email"
+                class="form-control"
+                [class.is-invalid]="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+              @if (editForm.get('email')?.invalid && editForm.get('email')?.touched) {
+                <div class="invalid-feedback">
+                  El email no es válido.
+                </div>
+              }
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end">
+              <button type="button" class="btn btn-outline-secondary px-4" (click)="cancelEdit()">Cancelar</button>
+              <button type="submit" class="btn btn-primary px-4" [disabled]="isLoading">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Actualizando...
+                } @else {
+                  <i class="bi bi-pencil me-2"></i>
+                  Actualizar Usuario
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- Users List -->
+    <div class="row">
+      @if (isLoading && users.length === 0) {
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando usuarios...</span>
+          </div>
+          <p class="mt-3 text-muted">Cargando usuarios...</p>
+        </div>
+      }
+
+      @for (user of users; track user.rut) {
+        <div class="col-12 mb-3">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <div class="d-flex align-items-center mb-2">
+                    <h5 class="card-title mb-0 me-3">{{ user.nombre }}</h5>
+                    <span class="badge" [class]="'bg-' + getRoleColor(user.rol)">
+                      {{ getRoleDisplayName(user.rol) }}
+                    </span>
+                  </div>
+                  <div class="row text-sm">
+                    <div class="col-md-4">
+                      <small class="text-muted">
+                        <i class="bi bi-person-badge me-1"></i>RUT: {{ user.rut }}
+                      </small>
+                    </div>
+                    <div class="col-md-4">
+                      <small class="text-muted">
+                        <i class="bi bi-envelope me-1"></i>{{ user.email }}
+                      </small>
+                    </div>
+                    <div class="col-md-4">
+                      <small class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>{{ user.fechaCreacion | date:'short' }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 text-end">
+                  <div class="d-flex gap-2 justify-content-end">
+                    <button class="btn btn-outline-primary btn-sm" (click)="startEditUser(user)" [disabled]="isLoading">
+                      <i class="bi bi-pencil me-1"></i>Editar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" (click)="deleteUser(user)" [disabled]="isLoading">
+                      <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (!isLoading && users.length === 0) {
+        <div class="col-12">
+          <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+              <div class="display-1 text-muted mb-3">👥</div>
+              <h4 class="card-title text-muted">No hay usuarios registrados</h4>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>

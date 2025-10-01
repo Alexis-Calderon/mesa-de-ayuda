@@ -40,6 +40,13 @@ export class TicketList implements OnInit {
     { value: 'Alta', label: 'Alta' }
   ];
 
+  typeOptions = [
+    { value: '', label: 'Todos los tipos' },
+    { value: 'Incidente', label: 'Incidente' },
+    { value: 'Requerimiento', label: 'Requerimiento' },
+    { value: 'Consulta', label: 'Consulta' }
+  ];
+
   areaOptions = [
     { value: '', label: 'Todas las áreas' },
     { value: 'Calidad', label: 'Calidad' },
@@ -56,6 +63,7 @@ export class TicketList implements OnInit {
     this.filterForm = this.fb.group({
       estado: [''],
       prioridad: [''],
+      tipo: [''],
       area: [''],
       search: ['']
     });
@@ -99,6 +107,11 @@ export class TicketList implements OnInit {
         return false;
       }
 
+      // Filtro por tipo
+      if (filters.tipo && ticket.tipo !== filters.tipo) {
+        return false;
+      }
+
       // Filtro por área
       if (filters.area && ticket.area !== filters.area) {
         return false;
@@ -126,10 +139,10 @@ export class TicketList implements OnInit {
     if (!this.currentUser) return false;
 
     // Administradores pueden editar todos
-    if (this.currentUser.rol === 1) return true;
+    if (this.currentUser.rol === 'Administrador') return true;
 
     // Técnicos pueden editar tickets asignados
-    if (this.currentUser.rol === 2 && ticket.usuarioRutTecnicoNavigation?.rut === this.currentUser.rut) {
+    if (this.currentUser.rol === 'Técnico' && ticket.usuarioRutTecnicoNavigation?.rut === this.currentUser.rut) {
       return true;
     }
 
@@ -139,11 +152,8 @@ export class TicketList implements OnInit {
   canResolveTicket(ticket: Ticket): boolean {
     if (!this.currentUser) return false;
 
-    // Administradores pueden resolver todos
-    if (this.currentUser.rol === 1) return true;
-
-    // Técnicos pueden resolver tickets asignados
-    if (this.currentUser.rol === 2 && ticket.usuarioRutTecnicoNavigation?.rut === this.currentUser.rut) {
+    // Solo Técnicos pueden resolver tickets asignados
+    if (this.currentUser.rol === 'Técnico' && ticket.usuarioRutTecnicoNavigation?.rut === this.currentUser.rut) {
       return ticket.estado !== 'Resuelto';
     }
 
@@ -151,7 +161,7 @@ export class TicketList implements OnInit {
   }
 
   assignTecnico(ticket: Ticket): void {
-    if (!this.currentUser || this.currentUser.rol !== 1) return;
+    if (!this.currentUser || this.currentUser.rol !== 'Administrador') return;
 
     const rutTecnico = prompt('Ingrese el RUT del técnico:');
     if (!rutTecnico) return;
@@ -197,6 +207,15 @@ export class TicketList implements OnInit {
       case 'Alta': return 'priority-high';
       case 'Media': return 'priority-medium';
       case 'Baja': return 'priority-low';
+      default: return '';
+    }
+  }
+
+  getTypeColor(type: string): string {
+    switch (type) {
+      case 'Incidente': return 'type-incident';
+      case 'Requerimiento': return 'type-request';
+      case 'Consulta': return 'type-query';
       default: return '';
     }
   }

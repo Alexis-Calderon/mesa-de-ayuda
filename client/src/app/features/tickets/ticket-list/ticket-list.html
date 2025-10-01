@@ -1,141 +1,224 @@
-<div class="ticket-list-container">
-  <div class="header">
-    <h1>Lista de Tickets</h1>
-    <a routerLink="/tickets/create" class="btn-primary" *ngIf="currentUser?.rol === 3">
-      <span>+</span> Nuevo Ticket
-    </a>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters-card">
-    <h3>Filtros</h3>
-    <form [formGroup]="filterForm" class="filters-form">
-      <div class="filter-row">
-        <div class="filter-group">
-          <label for="estado">Estado</label>
-          <select id="estado" formControlName="estado">
-            <option *ngFor="let option of statusOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="prioridad">Prioridad</label>
-          <select id="prioridad" formControlName="prioridad">
-            <option *ngFor="let option of priorityOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="area">Área</label>
-          <select id="area" formControlName="area">
-            <option *ngFor="let option of areaOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="search">Buscar</label>
-          <input
-            type="text"
-            id="search"
-            formControlName="search"
-            placeholder="Buscar en descripción..."
-          >
-        </div>
-      </div>
-
-      <div class="filter-actions">
-        <button type="button" class="btn-secondary" (click)="clearFilters()">
-          Limpiar Filtros
-        </button>
-        <button type="button" class="btn-primary" (click)="loadTickets()">
-          Actualizar
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Tickets List -->
-  <div class="tickets-section">
-    <div class="loading" *ngIf="isLoading">
-      <p>Cargando tickets...</p>
-    </div>
-
-    <div class="no-tickets" *ngIf="!isLoading && filteredTickets.length === 0 && tickets.length === 0">
-      <p>No hay tickets disponibles.</p>
-      <a routerLink="/tickets/create" class="btn-primary" *ngIf="currentUser?.rol === 3">
-        Crear tu primer ticket
+<div class="container-fluid py-4">
+  <div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">Lista de Tickets</h1>
+      @if (currentUser?.rol === 'Cliente') {
+      <a routerLink="/tickets/create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Nuevo Ticket
       </a>
+      }
     </div>
 
-    <div class="no-results" *ngIf="!isLoading && filteredTickets.length === 0 && tickets.length > 0">
-      <p>No se encontraron tickets con los filtros aplicados.</p>
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h3 class="card-title h5 mb-3">Filtros</h3>
+        <form [formGroup]="filterForm" class="row g-3">
+          <div class="col-md-3">
+            <label for="estado" class="form-label fw-semibold">Estado</label>
+            <select id="estado" formControlName="estado" class="form-select">
+              @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">
+                {{ option.label }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="prioridad" class="form-label fw-semibold">Prioridad</label>
+            <select id="prioridad" formControlName="prioridad" class="form-select">
+              @for (option of priorityOptions; track option.value) {
+              <option [value]="option.value">
+                {{ option.label }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="tipo" class="form-label fw-semibold">Tipo</label>
+            <select id="tipo" formControlName="tipo" class="form-select">
+              @for (option of typeOptions; track option.value) {
+              <option [value]="option.value">
+                {{ option.label }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="area" class="form-label fw-semibold">Área</label>
+            <select id="area" formControlName="area" class="form-select">
+              @for (option of areaOptions; track option.value) {
+              <option [value]="option.value">
+                {{ option.label }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="search" class="form-label fw-semibold">Buscar</label>
+            <input
+              type="text"
+              id="search"
+              formControlName="search"
+              class="form-control"
+              placeholder="Buscar en descripción..."
+            />
+          </div>
+
+          <div class="col-12">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+                <i class="bi bi-x-circle me-2"></i>Limpiar Filtros
+              </button>
+              <button type="button" class="btn btn-primary" (click)="loadTickets()">
+                <i class="bi bi-search me-2"></i>Actualizar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <div class="ticket-card" *ngFor="let ticket of filteredTickets">
-      <div class="ticket-header">
-        <div class="ticket-id">
-          <span class="id-label">#{{ ticket.id }}</span>
+    <!-- Tickets List -->
+    <div class="row">
+      @if (isLoading) {
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando tickets...</span>
         </div>
-        <div class="ticket-badges">
-          <span class="badge status" [ngClass]="getStatusColor(ticket.estado)">
-            {{ ticket.estado }}
-          </span>
-          <span class="badge priority" [ngClass]="getPriorityColor(ticket.prioridad)">
-            {{ ticket.prioridad }}
-          </span>
-          <span class="badge area">
-            {{ getAreaDisplayName(ticket.area) }}
-          </span>
-        </div>
+        <p class="mt-3 text-muted">Cargando tickets...</p>
       </div>
-
-      <div class="ticket-content">
-        <h4>{{ ticket.descripcion }}</h4>
-        <p class="observations">{{ ticket.observaciones }}</p>
-
-        <div class="ticket-meta">
-          <div class="meta-item">
-            <strong>Creado por:</strong>
-            <span>{{ ticket.usuarioRutCreadorNavigation.nombre }}</span>
-          </div>
-          <div class="meta-item" *ngIf="ticket.usuarioRutTecnicoNavigation">
-            <strong>Asignado a:</strong>
-            <span>{{ ticket.usuarioRutTecnicoNavigation.nombre }}</span>
-          </div>
-          <div class="meta-item">
-            <strong>Fecha creación:</strong>
-            <span>{{ ticket.fechaCreacion | date:'short' }}</span>
-          </div>
-          <div class="meta-item" *ngIf="ticket.fechaResolucion">
-            <strong>Fecha resolución:</strong>
-            <span>{{ ticket.fechaResolucion | date:'short' }}</span>
+      } @if (!isLoading && filteredTickets.length === 0 && tickets.length === 0) {
+      <div class="col-12">
+        <div class="card border-0 shadow-sm text-center py-5">
+          <div class="card-body">
+            <div class="display-1 text-muted mb-3">📋</div>
+            <h4 class="card-title text-muted">No hay tickets disponibles</h4>
+            @if (currentUser?.rol === 'Cliente') {
+            <a routerLink="/tickets/create" class="btn btn-primary mt-3">
+              <i class="bi bi-plus-circle me-2"></i>Crear tu primer ticket
+            </a>
+            }
           </div>
         </div>
       </div>
-
-      <div class="ticket-actions" *ngIf="canEditTicket(ticket) || canResolveTicket(ticket)">
-        <button
-          class="btn-action assign"
-          (click)="assignTecnico(ticket)"
-          *ngIf="currentUser?.rol === 1 && !ticket.usuarioRutTecnicoNavigation"
-          [disabled]="isLoading">
-          👤 Asignar Técnico
-        </button>
-
-        <button
-          class="btn-action resolve"
-          (click)="resolveTicket(ticket)"
-          *ngIf="canResolveTicket(ticket)"
-          [disabled]="isLoading">
-          ✅ Resolver
-        </button>
+      } @if (!isLoading && filteredTickets.length === 0 && tickets.length > 0) {
+      <div class="col-12">
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          No se encontraron tickets con los filtros aplicados.
+        </div>
       </div>
+      } @for (ticket of filteredTickets; track ticket.id) {
+      <div class="col-12 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-2">
+                  <span class="badge bg-secondary me-2">#{{ ticket.id }}</span>
+                </h5>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <h6 class="card-subtitle mb-3">{{ ticket.descripcion }}</h6>
+            <p class="card-text text-muted small mb-3">{{ ticket.observaciones }}</p>
+
+            <!-- Ticket Properties -->
+            <div class="ticket-properties mb-3">
+              <div class="property-row">
+                <div class="property-item">
+                  <span class="property-label">Estado:</span>
+                  <span class="badge" [class]="getStatusColor(ticket.estado)">
+                    {{ ticket.estado }}
+                  </span>
+                </div>
+                <div class="property-item">
+                  <span class="property-label">Prioridad:</span>
+                  <span class="badge" [class]="getPriorityColor(ticket.prioridad)">
+                    {{ ticket.prioridad }}
+                  </span>
+                </div>
+              </div>
+              <div class="property-row">
+                <div class="property-item">
+                  <span class="property-label">Tipo:</span>
+                  <span class="badge" [class]="getTypeColor(ticket.tipo)">
+                    {{ ticket.tipo }}
+                  </span>
+                </div>
+                <div class="property-item">
+                  <span class="property-label">Área:</span>
+                  <span class="badge bg-light text-dark">
+                    {{ getAreaDisplayName(ticket.area) }}
+                  </span>
+                </div>
+              </div>
+              <div class="property-row">
+                <div class="property-item">
+                  <span class="property-label">Cliente:</span>
+                  <span class="property-value">{{
+                    ticket.usuarioRutCreadorNavigation.nombre
+                  }}</span>
+                </div>
+                <div class="property-item">
+                  <span class="property-label">Creado:</span>
+                  <span class="property-value">{{ ticket.fechaCreacion | date : 'short' }}</span>
+                </div>
+              </div>
+              <div class="property-row">
+                <div class="property-item">
+                  <span class="property-label">Técnico:</span>
+                  <span class="property-value">
+                    @if (ticket.usuarioRutTecnicoNavigation) {
+                    {{ ticket.usuarioRutTecnicoNavigation.nombre }}
+                    } @else { Sin asignar }
+                  </span>
+                </div>
+                <div class="property-item">
+                  <span class="property-label">Resuelto:</span>
+                  <span class="property-value">
+                    @if (ticket.fechaResolucion) {
+                    {{ ticket.fechaResolucion | date : 'short' }}
+                    } @else { Pendiente }
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            @if (canEditTicket(ticket) || canResolveTicket(ticket)) {
+            <div class="d-flex gap-2 justify-content-end">
+              @if (currentUser?.rol === 'Administrador' && !ticket.usuarioRutTecnicoNavigation) {
+              <button
+                class="btn btn-outline-primary btn-sm"
+                (click)="assignTecnico(ticket)"
+                [disabled]="isLoading"
+              >
+                <i class="bi bi-person-plus me-1"></i>Asignar Técnico
+              </button>
+              } @if (canResolveTicket(ticket)) {
+              <button
+                class="btn btn-success btn-sm"
+                (click)="resolveTicket(ticket)"
+                [disabled]="isLoading"
+              >
+                <i class="bi bi-check-circle me-1"></i>Resolver
+              </button>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+      }
     </div>
   </div>
 </div>
