@@ -8,7 +8,7 @@ import { Usuario } from '../models/auth.models';
   providedIn: 'root'
 })
 export class ProfileService {
-  private readonly API_URL = 'http://localhost:8080/api/perfil';
+  private readonly API_URL = 'api/api/perfil';
   private currentProfileSubject = new BehaviorSubject<Usuario | null>(null);
   public currentProfile$ = this.currentProfileSubject.asObservable();
 

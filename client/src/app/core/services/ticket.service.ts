@@ -7,7 +7,7 @@ import { Ticket, TicketCreate, TicketUpdate, DashboardStats } from '../models/ti
   providedIn: 'root'
 })
 export class TicketService {
-  private readonly API_URL = 'http://localhost:8080/api/tickets';
+  private readonly API_URL = 'api/api/tickets';
 
   constructor(private http: HttpClient) {}
 

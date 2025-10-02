@@ -70,13 +70,6 @@ public class AuthController : ControllerBase
         return Ok("Sesión cerrada exitosamente");
     }
 
-    [HttpGet("health")]
-    [AllowAnonymous]
-    public IActionResult Health()
-    {
-        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
-    }
-
     private string GenerateJwtToken(Usuario usuario)
     {
         var jwtSettings = _configuration.GetSection("Jwt");
